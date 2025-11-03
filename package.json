@@ -1,0 +1,17 @@
+{
+  "name": "assignment-bank",
+  "version": "1.0.0",
+  "description": "This is the package json created by Jairo Calderon for web322 assigment Bank Account",
+  "main": "serverapp.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jairo Calderon",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "express-handlebars": "^8.0.3",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
+  }
+}
