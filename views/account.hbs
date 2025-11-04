@@ -52,9 +52,15 @@
                 value="withdraw"
                 required
               />Withdraw</label>
+            <label><input
+                type="radio"
+                name="action"
+                value="newAccount"
+              />Open a new account</label>
           </div>
           <button type="submit">Submit</button>
         </form>
+        <p id="error-message" class="error-message">{{data.msg}}</p>
       </div>
     </main>
   </body>

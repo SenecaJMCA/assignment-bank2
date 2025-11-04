@@ -99,14 +99,51 @@ app.get("/logout", (req, res) => {
   res.render("login");
 });
 
+//MY FIRST ATTEMPT
 app.post("/transaction", (req, res) => {
-  if (req.body.action === "balance") {
-    res.render("balancepg");
-  } else if (req.body.action === "deposit") {
-    res.render("depositpg");
-  } else if (req.body.action === "withdraw") {
-    res.render("withdrawpg");
-  }
+  let accNumb = req.body.account;
+
+  /*Read accounts.json based on the accNumber, and from that retrieve the type of account*/
+  fs.readFile(
+    path.join(__dirname, "./accounts.json"),
+    "utf-8",
+    function (err, data) {
+      //handling the error in case the file can't be read
+      if (err) {
+        console.log("Unable to read the file!");
+        return;
+      }
+
+      //storing the converted JSON object in to a JS obj
+      data = JSON.parse(data);
+
+      // using destructuring to loop over the object data and then compare the account number and its content
+      for (let [key, value] of Object.entries(data)) {
+        //checkign the account number entered by the user against any on the file
+        if (key == accNumb) {
+          //if accNumb exists, loop over the js object to extract its values
+          let accData = {
+            accNumb: key,
+            accType: value.accountType,
+            accBal: value.accountBalance,
+          };
+          if (req.body.action === "balance") {
+            return res.render("balancepg", {
+              data: accData,
+            });
+          } else if (req.body.action === "deposit") {
+            return res.render("depositpg", {
+              data: accData,
+            });
+          } else if (req.body.action === "withdraw") {
+            return res.render("withdrawpg", {
+              data: accData,
+            });
+          }
+        }
+      }
+    }
+  );
 });
 
 //listenign to the dedicated port

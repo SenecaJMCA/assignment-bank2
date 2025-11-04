@@ -22,9 +22,9 @@
       </div>
       <div class="account-box">
         <h3>Balance</h3>
-        <p>Account Number: {accountNumb}</p>
-        <p>Account Type: {accountType}</p>
-        <p>Account Balance: {accountBalance}</p>
+        <p>Account Number: {{data.accNumb}}</p>
+        <p>Account Type: {{data.accType}}</p>
+        <p>Account Balance: {{data.accBal}}</p>
         <form id="transactionForm" method="post" action="http://127.0.0.1:3000/account">
           <button type="submit">OK</button>
         </form>
