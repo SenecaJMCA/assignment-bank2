@@ -29,7 +29,7 @@ app.get("/login", (req, res) => {
 });
 
 //Submitting the username and pwd from the form
-app.post("/", (req, res) => {
+app.post("/account", (req, res) => {
   //Getting the username and password from the user input and storing it into variables
   let userName = req.body.email;
   let pwd = req.body.password;
@@ -99,14 +99,14 @@ app.get("/logout", (req, res) => {
   res.render("login");
 });
 
-app.post("/balance", (req, res) => {
-  res.render("balancepg");
-});
-app.post("/depositpg", (req, res) => {
-  res.render("depositpg");
-});
-app.post("/withdrawpg", (req, res) => {
-  res.render("withdrawpg");
+app.post("/transaction", (req, res) => {
+  if (req.body.action === "balance") {
+    res.render("balancepg");
+  } else if (req.body.action === "deposit") {
+    res.render("depositpg");
+  } else if (req.body.action === "withdraw") {
+    res.render("withdrawpg");
+  }
 });
 
 //listenign to the dedicated port
