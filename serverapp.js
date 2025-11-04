@@ -99,6 +99,16 @@ app.get("/logout", (req, res) => {
   res.render("login");
 });
 
+app.post("/balance", (req, res) => {
+  res.render("balancepg");
+});
+app.post("/depositpg", (req, res) => {
+  res.render("depositpg");
+});
+app.post("/withdrawpg", (req, res) => {
+  res.render("withdrawpg");
+});
+
 //listenign to the dedicated port
 let server = app.listen(HTTP_PORT, function () {
   console.log(`Listening to port ${HTTP_PORT}`);

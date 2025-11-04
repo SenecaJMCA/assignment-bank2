@@ -1,0 +1,34 @@
+<html lang="en">
+  <head>
+    <!-- A PROJECT CREATED BY JAIRO CALDERON -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/account.css" />
+    <title>The Imperfect Bank - Account</title>
+  </head>
+  <body>
+    {{!-- <header>
+      <h1>The Imperfect Bank</h1>
+      <div class="user-info">
+        <span id="username">{{data.user}}</span>
+        <a href="/logout" id="logout">Logout</a>
+
+      </div>
+    </header> --}}
+    {{>header}}
+    <main>
+      <div class="logo-placeholder">
+        <img src="/bank.png" alt="Bank Logo" />
+      </div>
+      <div class="account-box">
+        <h3>Balance</h3>
+        <p>Account Number: {accountNumb}</p>
+        <p>Account Type: {accountType}</p>
+        <p>Account Balance: {accountBalance}</p>
+        <form id="transactionForm">
+          <button type="submit">OK</button>
+        </form>
+      </div>
+    </main>
+  </body>
+</html>
