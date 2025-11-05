@@ -174,7 +174,10 @@ app.post("/backToAccount", (req, res) => {
 
 app.post("/deposit", (req, res) => {
   let accNumb = req.body.account;
-  let amount = Number(req.body.amount);
+  let amount = parseFloat(req.body.amount);
+
+  console.log(accNumb);
+  console.log(amount);
 
   if (amount < 0) {
     return res.render("depositpg", {
@@ -195,9 +198,63 @@ app.post("/deposit", (req, res) => {
 
       for (let [key, value] of Object.entries(data)) {
         if (key == accNumb) {
-          let existingBal = Number(value.accountBalance);
+          let existingBal = parseFloat(value.accountBalance);
           let newBal = existingBal + amount;
           value.accountBalance = newBal;
+        }
+      }
+      fs.writeFile(
+        path.join(__dirname, "./accounts.json"),
+        JSON.stringify(data, null, 2),
+        () => {
+          return res.render("account", {
+            data: req.MySession.user,
+          });
+        }
+      );
+    }
+  );
+});
+
+app.post("/withdraw", (req, res) => {
+  let accNumb = req.body.account;
+  let amount = parseFloat(req.body.amount);
+
+  console.log(accNumb);
+  console.log(amount);
+
+  let invalidMsgData = { msg: "Invalid amount", user: req.MySession.user };
+
+  if (amount < 0) {
+    return res.render("withdrawpg", {
+      // data: { msg: "Invalid amount" },
+      data: invalidMsgData,
+    });
+  }
+
+  fs.readFile(
+    path.join(__dirname, "./accounts.json"),
+    "utf-8",
+    (err, rawData) => {
+      if (err) {
+        console.log("Unable to read the file!");
+        return;
+      }
+
+      let data = JSON.parse(rawData);
+
+      for (let [key, value] of Object.entries(data)) {
+        if (key == accNumb) {
+          let existingBal = parseFloat(value.accountBalance);
+          let newBal = existingBal - amount;
+          if (newBal < 0) {
+            return res.render("account", {
+              // data: { msg: "Invalid amount" },
+              data: invalidMsgData,
+            });
+          } else {
+            value.accountBalance = newBal;
+          }
         }
       }
       fs.writeFile(
