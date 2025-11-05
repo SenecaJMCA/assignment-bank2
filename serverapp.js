@@ -34,7 +34,7 @@ app.use(
     duration: 5 * 60 * 1000,
     activeDuration: 1 * 60 * 1000,
     httpOnly: true,
-    secure: true,
+    secure: false /*setting it up to false allows the testing from local host*/,
     ephemeral: true,
   })
 );
@@ -144,7 +144,7 @@ app.post("/transaction", (req, res) => {
             accNumb: key,
             accType: value.accountType,
             accBal: value.accountBalance,
-            // user: req.session.user,
+            user: req.MySession.user,
           };
           if (req.body.action === "balance") {
             return res.render("balancepg", {
@@ -161,6 +161,54 @@ app.post("/transaction", (req, res) => {
           }
         }
       }
+    }
+  );
+});
+
+app.post("/backToAccount", (req, res) => {
+  let userData = { user: req.MySession.user };
+  res.render("account", {
+    data: userData,
+  });
+});
+
+app.post("/deposit", (req, res) => {
+  let accNumb = req.body.account;
+  let amount = Number(req.body.amount);
+
+  if (amount < 0) {
+    return res.render("depositpg", {
+      data: { msg: "Invalid amount" },
+    });
+  }
+
+  fs.readFile(
+    path.join(__dirname, "./accounts.json"),
+    "utf-8",
+    (err, rawData) => {
+      if (err) {
+        console.log("Unable to read the file!");
+        return;
+      }
+
+      let data = JSON.parse(rawData);
+
+      for (let [key, value] of Object.entries(data)) {
+        if (key == accNumb) {
+          let existingBal = Number(value.accountBalance);
+          let newBal = existingBal + amount;
+          value.accountBalance = newBal;
+        }
+      }
+      fs.writeFile(
+        path.join(__dirname, "./accounts.json"),
+        JSON.stringify(data, null, 2),
+        () => {
+          return res.render("account", {
+            data: req.MySession.user,
+          });
+        }
+      );
     }
   );
 });

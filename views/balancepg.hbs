@@ -7,14 +7,7 @@
     <title>The Imperfect Bank - Account</title>
   </head>
   <body>
-    {{!-- <header>
-      <h1>The Imperfect Bank</h1>
-      <div class="user-info">
-        <span id="username">{{data.user}}</span>
-        <a href="/logout" id="logout">Logout</a>
-
-      </div>
-    </header> --}}
+    
     {{>header}}
     <main>
       <div class="logo-placeholder">
@@ -25,7 +18,7 @@
         <p>Account Number: {{data.accNumb}}</p>
         <p>Account Type: {{data.accType}}</p>
         <p>Account Balance: {{data.accBal}}</p>
-        <form id="transactionForm" method="post" action="http://127.0.0.1:3000/account">
+        <form id="transactionForm" method="post" action="/backToAccount">
           <button type="submit">OK</button>
         </form>
       </div>
