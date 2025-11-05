@@ -5,6 +5,8 @@ const express = require("express"); // handle routes
 const expresshbs = require("express-handlebars"); // handle the template
 const path = require("path"); // handle the directory path fuctions
 const fs = require("fs"); // handle the reading function
+const session = require("client-sessions");
+const randomStr = require("randomstring");
 
 const app = express();
 
@@ -22,6 +24,20 @@ app.engine(
 );
 
 app.set("view engine", ".hbs");
+
+//provalemente sera aqui q eu irei inserir o codigo de sessao
+let strRandom = randomStr.generate();
+app.use(
+  session({
+    cookieName: "MySession",
+    secret: strRandom,
+    duration: 5 * 60 * 1000,
+    activeDuration: 1 * 60 * 1000,
+    httpOnly: true,
+    secure: true,
+    ephemeral: true,
+  })
+);
 
 //Display the login template
 app.get("/login", (req, res) => {
@@ -56,6 +72,7 @@ app.post("/account", (req, res) => {
           // registeredAccount = true;
           //passing the username to the account's name on the account page
           let userData = { user: userName };
+          req.MySession.user = userName;
           //rendering the account page
           return res.render("account", {
             data: userData,
@@ -96,14 +113,15 @@ app.post("/account", (req, res) => {
 
 //adding the functionality to the log out button to return to the login page
 app.get("/logout", (req, res) => {
+  req.MySession.reset();
   res.render("login");
 });
 
-//MY FIRST ATTEMPT
+//Handling the request submission for one of the options from the account menu (balance, deposit, withdraw, create account)
 app.post("/transaction", (req, res) => {
   let accNumb = req.body.account;
 
-  /*Read accounts.json based on the accNumber, and from that retrieve the type of account*/
+  /*Read accounts.json based on the accNumber, and from that retrieve the type of account and balance*/
   fs.readFile(
     path.join(__dirname, "./accounts.json"),
     "utf-8",
@@ -126,6 +144,7 @@ app.post("/transaction", (req, res) => {
             accNumb: key,
             accType: value.accountType,
             accBal: value.accountBalance,
+            // user: req.session.user,
           };
           if (req.body.action === "balance") {
             return res.render("balancepg", {
