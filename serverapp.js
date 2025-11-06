@@ -121,6 +121,13 @@ app.get("/logout", (req, res) => {
 app.post("/transaction", (req, res) => {
   let accNumb = req.body.account;
 
+  if (req.body.action === "newAccount") {
+    return res.render("registerAccpg", {
+      // data: accData,
+      data: { user: req.MySession.user },
+    });
+  }
+
   /*Read accounts.json based on the accNumber, and from that retrieve the type of account and balance*/
   fs.readFile(
     path.join(__dirname, "./accounts.json"),
@@ -257,6 +264,47 @@ app.post("/withdraw", (req, res) => {
           }
         }
       }
+      fs.writeFile(
+        path.join(__dirname, "./accounts.json"),
+        JSON.stringify(data, null, 2),
+        () => {
+          return res.render("account", {
+            data: req.MySession.user,
+          });
+        }
+      );
+    }
+  );
+});
+
+app.post("/newAccount", (req, res) => {
+  let accType = req.body.value;
+
+  fs.readFile(
+    path.join(__dirname, "./accounts.json"),
+    "utf-8",
+    (err, rawData) => {
+      if (err) {
+        console.log("Unable to read the file!");
+        return;
+      }
+
+      let data = JSON.parse(rawData);
+
+      //Assigning the value of first element in number type of the converted JSON to a variable (lastAccountNumb)
+      let lastAccountNumb = Number(Object.values(data)[0]);
+      //Incrementing the value of the lastAccountNumb by one, this will be the new account number created, and converting it back to string
+      let newAccountNumb = String(lastAccountNumb + 1);
+
+      // data.newAccountNumb = {"accountType": accType,"accountBalance":0}
+
+      //Converting back the number stored in newAccountNumb into string and passing to the value of the first element of the converted JSON
+      // Object.values(data)[0] = String(newAccountNumb);
+
+      Object.assign(data, {
+        newAccountNumb: { accountType: accType, accountBalance: 0 },
+      });
+
       fs.writeFile(
         path.join(__dirname, "./accounts.json"),
         JSON.stringify(data, null, 2),

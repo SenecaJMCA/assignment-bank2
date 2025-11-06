@@ -5,16 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/account.css" />
     <title>The Imperfect Bank - Account</title>
+    <script>
+      const accountNumbInput = document.getElementbyId('account');
+      const radioInputs = document.querySelectorAll('input[name="action"]');
+
+      radioInputs.forEach((radioInput)=>{
+          if(radioInput === "newAccount" && radioInput.checked){
+            accountNumbInput.removeAttribute("required");
+            accountNumbInput.disable = true;
+            accountNumbInput.value="",
+
+          }else{
+            accountNumbInput.required = true;
+            accountNumbInput.disable = false;
+          }
+        }
+      )
+    </script>
   </head>
   <body>
-    {{!-- <header>
-      <h1>The Imperfect Bank</h1>
-      <div class="user-info">
-        <span id="username">{{data.user}}</span>
-        <a href="/logout" id="logout">Logout</a>
-
-      </div>
-    </header> --}}
     {{>header}}
     <main>
       <div class="logo-placeholder">
@@ -22,17 +31,14 @@
       </div>
       <div class="account-box">
         <h3>Menu</h3>
-        {{!-- <p id="balance">$0.00</p> --}}
         <form id="transactionForm" method="post" action="/transaction">
           <input
             type="number"
             id="account"
             name="account"
             placeholder="Account Number"
-            required
+            
           />
-          {{!-- <label for="amount">Amount</label>
-          <input type="number" id="amount" name="amount" step="0.01" required /> --}}
           <div class="radio-group">
             <label><input
                 type="radio"
@@ -65,3 +71,20 @@
     </main>
   </body>
 </html>
+
+{{!-- <script>
+  const accountNumbInput = document.getElementbyId('account');
+  const radioInputs = document.querySelectorAll('input[name="action"]');
+
+radioInputs.forEach((radioInput)=>{
+    if(radioInput === "newAccount" && radioInput.checked){
+      accountNumbInput.removeAttribute("required");
+      accountNumbInput.disable = true;
+      accountNumbInput.value="",
+
+    }else{
+      accountNumbInput.required = true;
+      accountNumbInput.disable = false;
+    }
+})
+</script> --}}

@@ -1,0 +1,47 @@
+<html lang="en">
+  <head>
+    <!-- A PROJECT CREATED BY JAIRO CALDERON -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/account.css" />
+    <title>The Imperfect Bank - Account</title>
+  </head>
+  <body>
+    {{>header}}
+    <main>
+      <div class="logo-placeholder">
+        <img src="/bank.png" alt="Bank Logo" />
+      </div>
+      <div class="account-box">
+        <h3>Select the type of account:</h3>
+        <form id="transactionForm" method="post" action="/newAccount">
+        {{!-- <input type="hidden" name="user" value="{{data.user}}"/> --}}
+          <div class="radio-group">
+            <label><input
+                type="radio"
+                name="action"
+                value="checking"
+                required
+              />Checking</label>
+            <label><input
+                type="radio"
+                name="action"
+                value="saving"
+                required
+              />Saving</label>
+          </div>
+          <button type="submit">Submit</button>
+          <button type="cancel" formaction="/backToAccount">Cancel</button>
+        </form>
+        <p id="error-message" class="error-message">{{data.msg}}</p>
+      </div>
+    </main>
+  </body>
+</html>
+
+{{!-- let accData = {
+            accNumb: key,
+            accType: value.accountType,
+            accBal: value.accountBalance,
+            user: req.MySession.user,
+          }; --}}

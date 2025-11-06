@@ -15,5 +15,8 @@
   "0000015": {
     "accountType": "Chequing",
     "accountBalance": 0
+  },
+  "newAccountNumb": {
+    "accountBalance": 0
   }
 }
