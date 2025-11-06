@@ -52,7 +52,6 @@ app.post("/account", (req, res) => {
 
   //Checking if the username and the password is regitered in the user.json file
   //Reading the username and password from the file user.json and creatin a JS object
-  //Reading the user.json file
   fs.readFile(
     path.join(__dirname, "./user.json"),
     "utf-8",
@@ -69,11 +68,10 @@ app.post("/account", (req, res) => {
       //using destructuring to loop over the object data and then compare the userName and pwd
       for (let [key, value] of Object.entries(data)) {
         if (key == userName && value == pwd) {
-          // registeredAccount = true;
           //passing the username to the account's name on the account page
           let userData = { user: userName };
           req.MySession.user = userName;
-          //rendering the account page
+          //rendering the account page with the information from userData
           return res.render("account", {
             data: userData,
           });
@@ -117,18 +115,19 @@ app.get("/logout", (req, res) => {
   res.render("login");
 });
 
-//Handling the request submission for one of the options from the account menu (balance, deposit, withdraw, create account)
+//Handling the request submission for the options from the account menu (balance, deposit, withdraw, create account)
 app.post("/transaction", (req, res) => {
+  //retrieving and storing values from the request object that were sent by the form
   let accNumb = req.body.account;
 
+  //handling the request for opening a new account since it does not requires an account number in the account input of the form
   if (req.body.action === "newAccount") {
     return res.render("registerAccpg", {
-      // data: accData,
       data: { user: req.MySession.user },
     });
   }
 
-  /*Read accounts.json based on the accNumber, and from that retrieve the type of account and balance*/
+  //Read accounts.json based on the accNumb
   fs.readFile(
     path.join(__dirname, "./accounts.json"),
     "utf-8",
@@ -142,17 +141,18 @@ app.post("/transaction", (req, res) => {
       //storing the converted JSON object in to a JS obj
       data = JSON.parse(data);
 
-      // using destructuring to loop over the object data and then compare the account number and its content
+      // using destructuring to loop over the object data and then compare the account number and its key pairs values
       for (let [key, value] of Object.entries(data)) {
-        //checkign the account number entered by the user against any on the file
+        //checkign the account number entered by the user against the existing ones on the file
         if (key == accNumb) {
-          //if accNumb exists, loop over the js object to extract its values
+          //if accNumb matchs the key value, loop over the js object to extract its values
           let accData = {
             accNumb: key,
             accType: value.accountType,
             accBal: value.accountBalance,
             user: req.MySession.user,
           };
+          //Depending on the option submitted on the form the server app will render the page requested
           if (req.body.action === "balance") {
             return res.render("balancepg", {
               data: accData,
@@ -172,6 +172,7 @@ app.post("/transaction", (req, res) => {
   );
 });
 
+//handles the cancel options in the transactions pages
 app.post("/backToAccount", (req, res) => {
   let userData = { user: req.MySession.user };
   res.render("account", {
@@ -180,15 +181,18 @@ app.post("/backToAccount", (req, res) => {
 });
 
 app.post("/deposit", (req, res) => {
+  //retrieving and storing values from the request object that were sent by the form
   let accNumb = req.body.account;
   let amount = parseFloat(req.body.amount);
 
+  //checking if the amount entered by the user is valid (greater than zero)
   if (amount < 0) {
     return res.render("depositpg", {
       data: { msg: "Invalid amount" },
     });
   }
 
+  //reading file
   fs.readFile(
     path.join(__dirname, "./accounts.json"),
     "utf-8",
@@ -198,15 +202,19 @@ app.post("/deposit", (req, res) => {
         return;
       }
 
+      //converting the JSON obj into a JS Object
       let data = JSON.parse(rawData);
 
+      //using the destructor of object to loop over the account values
       for (let [key, value] of Object.entries(data)) {
         if (key == accNumb) {
+          //if account exist then make sure the new amount + the existing balnace will be added correct
           let existingBal = parseFloat(value.accountBalance);
           let newBal = existingBal + amount;
           value.accountBalance = newBal;
         }
       }
+      //writing in the file to update the account balance
       fs.writeFile(
         path.join(__dirname, "./accounts.json"),
         JSON.stringify(data, null, 2),
@@ -221,12 +229,13 @@ app.post("/deposit", (req, res) => {
 });
 
 app.post("/withdraw", (req, res) => {
-  //retrieving and storing values on the request object sent from the form
+  //retrieving and storing values from the request object that were sent by the form
   let accNumb = req.body.account;
   let amount = parseFloat(req.body.amount);
 
+  //setting up a msg for invalid amount
   let invalidMsgData = { msg: "Invalid amount", user: req.MySession.user };
-
+  //checking if the amount if invalid and rendering a the invalid message if true
   if (amount < 0) {
     return res.render("withdrawpg", {
       data: invalidMsgData,
@@ -242,22 +251,28 @@ app.post("/withdraw", (req, res) => {
         return;
       }
 
+      //converting the JSON obj into a JS Object
       let data = JSON.parse(rawData);
 
+      //using the destructor of object to loop over the account values
       for (let [key, value] of Object.entries(data)) {
+        //checking if the the account number entered by the user exist in the the file
         if (key == accNumb) {
           let existingBal = parseFloat(value.accountBalance);
           let newBal = existingBal - amount;
+          //making sure the amount entered by the user won't leave the account balance in negative
           if (newBal < 0) {
             return res.render("account", {
-              // data: { msg: "Invalid amount" },
               data: invalidMsgData,
             });
           } else {
+            //if the end balance is still positive, then update the new balance in the account
             value.accountBalance = newBal;
           }
         }
       }
+
+      //writing in the file the update balance of the account
       fs.writeFile(
         path.join(__dirname, "./accounts.json"),
         JSON.stringify(data, null, 2),
@@ -272,6 +287,7 @@ app.post("/withdraw", (req, res) => {
 });
 
 app.post("/newAccount", (req, res) => {
+  //retrieving and storing values from the request object that were sent by the form
   let accType = req.body.action;
 
   fs.readFile(
