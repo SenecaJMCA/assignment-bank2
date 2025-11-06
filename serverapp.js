@@ -183,9 +183,6 @@ app.post("/deposit", (req, res) => {
   let accNumb = req.body.account;
   let amount = parseFloat(req.body.amount);
 
-  console.log(accNumb);
-  console.log(amount);
-
   if (amount < 0) {
     return res.render("depositpg", {
       data: { msg: "Invalid amount" },
@@ -224,17 +221,14 @@ app.post("/deposit", (req, res) => {
 });
 
 app.post("/withdraw", (req, res) => {
+  //retrieving and storing values on the request object sent from the form
   let accNumb = req.body.account;
   let amount = parseFloat(req.body.amount);
-
-  console.log(accNumb);
-  console.log(amount);
 
   let invalidMsgData = { msg: "Invalid amount", user: req.MySession.user };
 
   if (amount < 0) {
     return res.render("withdrawpg", {
-      // data: { msg: "Invalid amount" },
       data: invalidMsgData,
     });
   }
@@ -278,7 +272,7 @@ app.post("/withdraw", (req, res) => {
 });
 
 app.post("/newAccount", (req, res) => {
-  let accType = req.body.value;
+  let accType = req.body.action;
 
   fs.readFile(
     path.join(__dirname, "./accounts.json"),
@@ -289,28 +283,34 @@ app.post("/newAccount", (req, res) => {
         return;
       }
 
+      //converting the JSON obj into a JS Object
       let data = JSON.parse(rawData);
 
-      //Assigning the value of first element in number type of the converted JSON to a variable (lastAccountNumb)
-      let lastAccountNumb = Number(Object.values(data)[0]);
-      //Incrementing the value of the lastAccountNumb by one, this will be the new account number created, and converting it back to string
-      let newAccountNumb = String(lastAccountNumb + 1);
+      //Assigning the value of element LastID to a variable (lastAccountNumb)
+      let lastAccountNumb = Number(data.lastID);
+      //Incrementing the value of the lastAccountNumb by one, and storing it into addedAccNumb
+      let addedAccNumb = lastAccountNumb + 1;
+      //Converting the type of addedAccNumb variable from number to String and addin trailing zeros to it
+      let addedAccStr = String(addedAccNumb).padStart(7, "0");
+      //updating the lastID value to the string number of the new account added
+      data.lastID = addedAccStr;
 
-      // data.newAccountNumb = {"accountType": accType,"accountBalance":0}
-
-      //Converting back the number stored in newAccountNumb into string and passing to the value of the first element of the converted JSON
-      // Object.values(data)[0] = String(newAccountNumb);
-
+      //Using the assign function to update and return a new data obj
       Object.assign(data, {
-        newAccountNumb: { accountType: accType, accountBalance: 0 },
+        [addedAccStr]: { accountType: accType, accountBalance: 0 },
       });
 
+      //upodating (writing) the JSOn object from the worked JS object and redering the account added and the account page
       fs.writeFile(
         path.join(__dirname, "./accounts.json"),
         JSON.stringify(data, null, 2),
         () => {
+          let accCreatedMsg = {
+            msg: `Account ${addedAccStr} has been created`,
+            user: req.MySession.user,
+          };
           return res.render("account", {
-            data: req.MySession.user,
+            data: accCreatedMsg,
           });
         }
       );
